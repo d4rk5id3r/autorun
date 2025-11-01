@@ -3,6 +3,7 @@ import json
 import requests
 import concurrent.futures
 from tqdm import tqdm
+import argparse
 
 API_URL = "https://api.wordpress.org/plugins/info/1.2/"
 PER_PAGE = 1000  # max allowed per API call
@@ -69,9 +70,16 @@ def download_plugin(slug):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Download WordPress plugins by install count range.")
+    parser.add_argument("--min", type=int, default=0, help="Minimum installs (default: 0)")
+    parser.add_argument("--max", type=int, default=1000000, help="Maximum installs (default: 1,000,000)")
+    args = parser.parse_args()
+
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    min_installs = int(input("Enter minimum installs: "))
-    max_installs = int(input("Enter maximum installs: "))
+    min_installs = args.min
+    max_installs = args.max
+
+    print(f"[*] Filtering plugins with installs between {min_installs} and {max_installs}...")
 
     plugins = fetch_plugins()
     filtered = filter_plugins(plugins, min_installs, max_installs)
